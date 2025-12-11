@@ -11,52 +11,66 @@
         padding: 0;
         font-family: 'Pretendard', sans-serif;
         background: linear-gradient(135deg, #ffdde1, #ee9ca7);
-        overflow-x: hidden;
+        overflow: hidden; /* 풍선 밖으로 튀어나오는 것 방지 */
+        display: flex;
+        justify-content: center;      /* 수평 중앙 */
+        align-items: center;          /* 수직 중앙 */
+        height: 100vh;
     }
 
-    .neon {
-        font-size: clamp(1.8rem, 5vw, 2.5rem);
-        text-align: center;
-        color: #ff7eb3;
-        text-shadow: 0 0 10px #ff7eb3, 0 0 25px #ff3fa1;
-        margin-top: 25px;
-        animation: flicker 2s infinite;
+    /* 풍선 레이어 */
+    .balloon-layer {
+        position: fixed;
+        bottom: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 0;
     }
 
-    @keyframes flicker {
-        0%,25%,56%,100% { opacity: 1; }
-        20%,54% { opacity: 0.4; }
+    .balloon {
+        position: absolute;
+        bottom: -150px;
+        width: 60px;
+        height: 80px;
+        border-radius: 50% 50% 45% 45%;
+        animation: floatUp 8s linear infinite;
+        box-shadow: inset -6px -12px 0 rgba(0,0,0,0.12);
     }
 
+    @keyframes floatUp {
+        0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(-130vh) rotate(12deg); opacity: 0; }
+    }
+
+    /* 카드 전체를 화면 안에서 정가운데 */
     .card {
         background: white;
-        width: 92%;
-        margin: 20px auto;
-        padding: 20px;
-        border-radius: 20px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        width: 90%;
+        max-width: 480px;
+        padding: 25px;
+        border-radius: 22px;
+        box-shadow: 0 12px 25px rgba(0,0,0,0.15);
         text-align: center;
         position: relative;
-        min-height: calc(100vh - 100px);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        z-index: 10;
     }
 
     h1 {
         font-size: clamp(1.4rem, 6vw, 2rem);
-        margin-bottom: 10px;
+        margin-bottom: 15px;
     }
 
     p {
-        font-size: clamp(1.3rem, 4.5vw, 1.7rem);
+        font-size: clamp(1.2rem, 4vw, 1.6rem);
+        margin-top: 10px;
     }
 
-    /* 🎯 캐릭터: 양옆 살짝 잘려도 크게 보이게 */
+    /* 캐릭터: 약간 잘려도 크게 보여주기 */
     .character-img {
-        width: 120vw;         /* 📌 화면보다 크게 */
+        width: 120vw;
         max-width: none;
-        margin-left: -10vw;   /* 중앙 맞춤 */
+        margin-left: -10vw;
         margin-right: -10vw;
         margin-top: 10px;
     }
@@ -64,9 +78,9 @@
     /* 케이크 */
     .cake-container {
         position: relative;
-        width: min(60vw, 250px);
-        height: min(50vw, 200px);
-        margin-top: -5px;
+        width: min(65vw, 240px);
+        height: min(55vw, 200px);
+        margin: -10px auto 0;
     }
 
     .cake {
@@ -79,48 +93,60 @@
     }
 
     .candle {
-        width: 12px;
-        height: 40px;
-        background: white;
-        border-radius: 4px;
+        width: 18px;
+        height: 55px;
+        background: linear-gradient(180deg, #ffe9ec 0%, #ff9aae 90%);
+        /* border-radius: 6px; */
+        /* border: 2px solid #ff6f91; */
+        box-shadow: 0 0 8px rgba(255, 105, 135, 0.4);
         position: absolute;
-        left: calc(50% - 6px);
+        left: calc(50% - 9px);
         bottom: 65%;
     }
 
+
+    /* 🔥 더 밝게, 선명하게 보이도록 개선된 불꽃 */
     .flame {
-        width: 18px;
-        height: 18px;
-        background: radial-gradient(circle, #ffeb3b 40%, #ff9800 70%);
+        width: 24px;
+        height: 24px;
+        background: radial-gradient(circle, #fff7a8 30%, #ffd94d 50%, #ff7b00 80%);
+        box-shadow: 0 0 15px #ffaf2e, 0 0 25px #ff7b00;
         border-radius: 50%;
         position: absolute;
-        top: -18px;
-        left: -3px;
+        top: -24px;
+        left: -4px;
         animation: flickerFlame 0.25s infinite alternate;
+        opacity: 1;
+        transform-origin: bottom center;
     }
 
     @keyframes flickerFlame {
         0% { transform: scale(1); opacity: 1; }
-        100% { transform: scale(1.2); opacity: 0.8; }
+        100% { transform: scale(1.28); opacity: 0.85; }
     }
 
     @keyframes flameOut {
         0% { opacity: 1; transform: scale(1); }
         100% { opacity: 0; transform: scale(0.3); }
     }
+
+
 </style>
 </head>
 
 <body>
 
-<div class="neon">🎉 생신 축하합니다 🎉</div>
+<!-- 풍선 레이어 -->
+<div class="balloon-layer" id="balloons"></div>
 
+<!-- 중앙 카드 -->
 <div class="card">
-
     <h1>엄마, 생신 진심으로 축하드려요 💕</h1>
 
+    <!-- 캐릭터 -->
     <img id="character" class="character-img" src="character_smile.png">
 
+    <!-- 케이크 -->
     <div class="cake-container">
         <div class="cake"></div>
         <div class="candle">
@@ -132,16 +158,51 @@
 </div>
 
 <script>
-setTimeout(() => {
-    document.getElementById("character").src = "character_blow.png";
+/* 풍선 자동 생성 */
+for (let i = 0; i < 18; i++) {
+    let b = document.createElement("div");
+    b.className = "balloon";
+    b.style.left = Math.random() * 100 + "vw";
+    b.style.background = ["#ff9aa2","#ffb7b2","#ffdac1","#e2f0cb","#b5ead7","#c7ceea"][Math.floor(Math.random()*6)];
+    b.style.animationDelay = (Math.random()*6)+"s";
+    b.style.transform = "scale(" + (0.8 + Math.random()*0.8) + ")";
+    document.getElementById("balloons").appendChild(b);
+}
 
+/* 🔁 반복 애니메이션 */
+// 1회 시퀀스:
+// 웃는 캐릭터 → 부는 캐릭터 → 불 꺼짐 → 웃는 캐릭터로 복귀 → 불 켜짐
+
+function playSequence() {
+    const character = document.getElementById("character");
     const flame = document.getElementById("flame");
-    flame.style.animation = "flickerFlame 0.12s infinite alternate";
 
+    // 1) 웃는 모습 → 부는 모습
+    setTimeout(() => {
+        character.src = "character_blow.png";
+        flame.style.animation = "flickerFlame 0.12s infinite alternate";
+    }, 500);
+
+    // 2) 촛불 꺼짐
     setTimeout(() => {
         flame.style.animation = "flameOut 0.5s forwards";
-    }, 600);
-}, 2500);
+    }, 1200);
+
+    // 3) 다시 웃는 캐릭터
+    setTimeout(() => {
+        character.src = "character_smile.png";
+    }, 2200);
+
+    // 4) 촛불 다시 켜짐
+    setTimeout(() => {
+        flame.style.opacity = 1;
+        flame.style.animation = "flickerFlame 0.25s infinite alternate";
+    }, 2600);
+}
+
+// 무한 반복
+playSequence();
+setInterval(playSequence, 3500);
 </script>
 
 </body>
